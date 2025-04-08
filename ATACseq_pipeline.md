@@ -54,6 +54,14 @@ This has to be run on both raw and trimmed directories.
 
 ## Alignment
 Indexed reference genome can be retrieved from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). For this project, the mouse genome from UCSC build mm10 was used.
+```bash
+(bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/CL13-1-ATAC_trimmed.fastq -S ALIGNMENTS/CL13-1-ATAC.sam) 2>CL13-1-ATAC.log
+(bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/CL13-2-ATAC_trimmed.fastq -S ALIGNMENTS/CL13-2-ATAC.sam) 2>CL13-2-ATAC.log
+(bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/CL13-3-ATAC_trimmed.fastq -S ALIGNMENTS/CL13-3-ATAC.sam) 2>CL13-3-ATAC.log
+(bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/NAIVE-1-ATAC_trimmed.fastq -S ALIGNMENTS/NAIVE-1-ATAC.sam) 2>NAIVE-1-ATAC.log
+(bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/NAIVE-2-ATAC_trimmed.fastq -S ALIGNMENTS/NAIVE-2-ATAC.sam) 2>NAIVE-2-ATAC.log
+(bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/NAIVE-3-ATAC_trimmed.fastq -S ALIGNMENTS/NAIVE-3-ATAC.sam) 2>NAIVE-2-ATAC.log
+```
 
 
 
