@@ -120,6 +120,7 @@ working.windows.final@rowRanges$sig <- "n.s."
 working.windows.final@rowRanges$sig[working.windows.final@rowRanges$FDR < 0.05] <- "significant"
 ```
 ### Annotation:
+There are multiple tools to annotate peaks. Using csaw's detailRanges function:
 ```R
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(org.Mm.eg.db)
@@ -131,6 +132,12 @@ working.windows.final@rowRanges$overlap <- annotations$overlap
 working.windows.final@rowRanges$left <- annotations$left
 working.windows.final@rowRanges$right <- annotations$right
 #working.windows.final@rowRanges
+```
+Using ChIPeakAnno's annotatePeak:
+```R
+ChIP_annotation <- annotatePeak(working.windows.final@rowRanges, TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene)
+#To access annotation field:
+#ChIP_annotation@anno
 ```
 ### Visualization
 Volcano plot:
@@ -240,6 +247,7 @@ Cl13_vs_Naive_occupancy <- dba.peakset(Cl13_vs_Naive, consensus = DBA_CONDITION,
 #Overlap of both consensus can be visualized on a Venn map
 #dba.plotVenn(Cl13_vs_Naive_occupancy, Cl13_vs_Naive_occupancy$masks$Consensus, main = "Overlap of Cl13 and Naive")
 ```
+It is important to note that DiffBind merges peaks that have an overlap of at least 1 bp. This can be replicated on csaw if needed. 
 ### Normalization
 There are multiple normalization methods in DiffBind. Reske et al. recommend Reads in peaks for ATAC seq:
 ```R
@@ -251,9 +259,71 @@ Cl13_vs_Naive_counts <- dba.normalize(Cl13_vs_Naive_counts, normalize = DBA_NORM
 Cl13_vs_Naive.model <- dba.contrast(Cl13_vs_Naive_counts,
                                     reorderMeta=list(Condition="Infected"))
 #Cl13_vs_Naive.model
-
-
+#Differential analysis
+Cl13_vs_Naive.model <- dba.analyze(Cl13_vs_Naive.model, method = DBA_DESEQ2)
+#Show result table
+#dba.show(Cl13_vs_Naive.model, bContrasts = TRUE,)
 ```
+To show a report of the differentially accesible site that pass a certain threshold (default FDR < 0.05):
+```R
+Cl13_vs_Naive.da <- dba.report(Cl13_vs_Naive.model)
+#Cl13_vs_Naive.da
+```
+### Visualization
+The easiest way to visualize data analyzed by DiffBind is to extract all the data to a new dataFrame in the same format as csaw's workflow:
+```R
+ATACDataDiffBind <- dba.report(Cl13_vs_Naive.model, th = 1, bUsePval = FALSE)
+```
+Annotation then works the same way as csaw's workflow:
+```R
+annotationsDiffbind <- detailRanges(ATACDataDiffBind,
+                            txdb = TxDb.Mmusculus.UCSC.mm10.knownGene,
+                            orgdb = org.Mm.eg.db,
+                            promoter = c(1500,500), dist = 10*1e3L)
+
+ATACDataDiffBind$overlap <- annotationsDiffbind$overlap
+ATACDataDiffBind$left <- annotationsDiffbind$left
+ATACDataDiffBind$right <- annotationsDiffbind$right
+#ATACDataDiffBind
+```
+Volcano plot:
+```R
+ATACDataDiffBind <- as.data.frame(ATACDataDiffBind)
+
+ATACDataDiffBind$sig <- "n.s."
+#Change to 0.05
+ATACDataDiffBind$sig[ATACDataDiffBind$FDR < 0.1] <- "significant"
+
+ATACDataDiffBind$annotated <- ATACDataDiffBind$overlap != ""
+ATACDataDiffBind$label <- NA
+ATACDataDiffBind$label[ATACDataDiffBind$annotated == TRUE & ATACDataDiffBind$FDR < 0.05] <- ATACDataDiffBind$overlap[ATACDataDiffBind$annotated == TRUE & ATACDataDiffBind$FDR < 0.05]
 
 
+ATACDataDiffBind$sig <- ifelse(ATACDataDiffBind$sig=="significant",TRUE,FALSE)
+#change to fdr 0.05
+ATACDataDiffBind$Dir <- "n.s"
+ATACDataDiffBind$Dir[ATACDataDiffBind$Fold > 0.6 & ATACDataDiffBind$FDR < 0.1] <- "Naive"
+ATACDataDiffBind$Dir[ATACDataDiffBind$Fold < -0.6 & ATACDataDiffBind$FDR < 0.1] <- "CL13"
+ATACDataDiffBind$Dir <- factor(ATACDataDiffBind$Dir, levels = c("Naive", "CL13", "n.s"))
 
+ggplot(data = ATACDataDiffBind, aes(x = Fold, y = -log10(FDR), col = Dir)) +
+  geom_point() +
+  theme_minimal() +
+  geom_vline(xintercept = c(-0.6, 0.6), col="gray25", linetype = "dashed") +
+  geom_hline(yintercept = -log10(0.1), col = "gray25", linetype = "dashed") +
+  #geom_hline(yintercept = -log10(0.0001262047), col = "gray25", linetype = "dashed") +
+  scale_color_manual(values = c("red", "blue", "gray")) +
+  labs(title = "DA regions - DiffBind", color = "Accessibility") +
+  geom_text_repel(aes(label = ifelse(!is.na(label), label, "")), label.padding = 0.25, point.padding = 1e-06)
+```
+![image](https://github.com/user-attachments/assets/add7a03a-d9a3-414f-ab04-03ae5eeb323b)
+MA plot:
+```R
+ggplot(data=ATACDataDiffBind,aes(x = Conc, y = Fold, col = factor(sig, levels=c("FALSE", "TRUE")))) + 
+  geom_point() + scale_color_manual(values = c("black", "red")) + 
+  geom_smooth(data = ATACDataDiffBind, aes(x = Conc, y = Fold), method = "loess") + 
+  geom_hline(yintercept = 0, color = "darkgreen", linetype = "dashed") + 
+  labs(title = "DA regions - Loess normalization", color = "Significance") +
+  geom_text_repel(aes(label = ifelse(!is.na(label), label, "")))
+```
+![image](https://github.com/user-attachments/assets/9fcff05b-b30c-47f8-8b79-2969c6fe4bbd)
