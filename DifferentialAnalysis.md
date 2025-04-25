@@ -9,6 +9,7 @@
 Both csaw and DiffBind workflows are present in this file. 
 ## csaw workflow
 This is an adaptation of Reske et al.'s csaw workflow for 3 biological repeats. 
+Annotation, visualization, peak subsetting were added by me. 
 ### Read in data:
 ```R
 library(GenomicRanges)
@@ -193,6 +194,8 @@ df_naive <- data.frame(seqnames = seqnames(NaiveDApeaks),
 write.table(df_naive, file="NaivePeaks.bed", quote=F, sep="\t", row.names=F, col.names=F)
 ```
 ## DiffBind workflow
+
+Workflow by me.
 ```R
 library(DiffBind)
 ```
