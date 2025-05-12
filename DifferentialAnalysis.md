@@ -8,7 +8,7 @@
 
 Both csaw and DiffBind workflows are present in this file. 
 ## csaw workflow
-This is an adaptation of Reske et al.'s csaw workflow for 3 biological repeats. 
+This is an adaptation of Reske et al.'s csaw workflow modified to work with 3 biological repeats. 
 Annotation, visualization, peak subsetting were added by me. 
 ### Read in data:
 ```R
