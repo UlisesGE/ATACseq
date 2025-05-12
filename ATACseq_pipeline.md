@@ -27,7 +27,8 @@ fastqc NAIVE-1-ATAC.fastq
 fastqc NAIVE-2-ATAC.fastq
 fastqc NAIVE-3-ATAC.fastq
 ```
-On th
+This has to be run on the raw file's directories. 
+
 Trim adapter sequences:
 ```bash
 cutadapt -a CTGTCTCTTATACACATCTGACGCTGCCGACGA -o TRIMMED/CL13-1-ATAC_trimmed.fastq RAW_READS/CL13-1-ATAC.fastq --cores 10
@@ -37,7 +38,7 @@ cutadapt -a CTGTCTCTTATACACATCTGACGCTGCCGACGA -o TRIMMED/NAIVE-1-ATAC_trimmed.fa
 cutadapt -a CTGTCTCTTATACACATCTGACGCTGCCGACGA -o TRIMMED/NAIVE-2-ATAC_trimmed.fastq RAW_READS/NAIVE-2-ATAC.fastq --cores 10
 cutadapt -a CTGTCTCTTATACACATCTGACGCTGCCGACGA -o TRIMMED/NAIVE-3-ATAC_trimmed.fastq RAW_READS/NAIVE-3-ATAC.fastq --cores 10
 ```
-Specific adapter sequences can be retreieved from Illumina's [Sequences for Nextera, Illumina Prep, and Illumina PCR Kits](https://support-docs.illumina.com/SHARE/AdapterSequences/Content/SHARE/AdapterSeq/Nextera/SequencesNextera_Illumina.htm). In this case, the reverse complement of the Nextera Transposase Adapters was used. 
+Specific adapter sequences can be retreieved from Illumina's [Sequences for Nextera, Illumina Prep, and Illumina PCR Kits](https://support-docs.illumina.com/SHARE/AdapterSequences/Content/SHARE/AdapterSeq/Nextera/SequencesNextera_Illumina.htm). In this case, the **reverse complement** of the Nextera Transposase Adapters was used. 
 
 QC trimmed reads:
 ```bash
@@ -53,7 +54,7 @@ Combine QC data:
 multiqc RAW_READS/
 multiqc TRIMMED/
 ```
-This has to be run on both raw and trimmed directories. 
+This has to be run on both raw and trimmed directories to combine both reports. 
 
 ## Alignment
 Indexed reference genome can be retrieved from [iGenomes](https://support.illumina.com/sequencing/sequencing_software/igenome.html). For this project, the mouse genome from UCSC build mm10 was used.
