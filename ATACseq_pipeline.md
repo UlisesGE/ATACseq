@@ -66,13 +66,13 @@ Indexed reference genome can be retrieved from [iGenomes](https://support.illumi
 (bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/NAIVE-2-ATAC_trimmed.fastq -S ALIGNMENTS/NAIVE-2-ATAC.sam) 2>NAIVE-2-ATAC.log
 (bowtie2 --no-unal --very-sensitive -p 30 -x REFERENCE/Mus_muscul/UCSC/mm10/Sequence/Bowtie2Index/genome -U TRIMMED/NAIVE-3-ATAC_trimmed.fastq -S ALIGNMENTS/NAIVE-3-ATAC.sam) 2>NAIVE-2-ATAC.log
 ```
-### Alignment adjustments and filtering
-It is necessary to edit the paths to alignment files and to output directory for filtered alignments. This script will sort, index, remove misaligned reads, mitochondrial reads, and PCR duplicates. 
+### Alignment QC  and filtering
+It is necessary to edit the script's paths to the alignment files and to the output directory for the filtered alignments. This script will sort, index, remove misaligned reads, mitochondrial reads, and PCR duplicates. 
 ```bash
 chmod +x SamtoolsFiltering.sh
 ./SamtoolsFiltering.sh
 ```
-The resultig filtered alignment and index files will be in a new directory, with the suffix *-v2.bam.
+The resultig filtered alignment and index files will be in a the specified output directory, with the suffix *-v2.bam.
 ## Visualize alignment coverage and pileups
 ```bash
 bamCoverage -b ALIGNMENTS/CL13-1-ATAC-v2.bam -o CL13-1-ATAC-coverage.bigwig -bs 1 -p max/2
@@ -82,7 +82,7 @@ bamCoverage -b ALIGNMENTS/NAIVE-1-ATAC-v2.bam -o NAIVE-1-ATAC-coverage.bigwig -b
 bamCoverage -b ALIGNMENTS/NAIVE-2-ATAC-v2.bam -o NAIVE-2-ATAC-coverage.bigwig -bs 1 -p max/2
 bamCoverage -b ALIGNMENTS/NAIVE-3-ATAC-v2.bam -o NAIVE-3-ATAC-coverage.bigwig -bs 1 -p max/2
 ```
-These bigwig files can then be used to visualize signal distribution for the sequencing reads using [IGV](https://igv.org/app/) or [WashU Epigenome Browser](https://epigenomegateway.wustl.edu/legacy/). 
+The resulting bigwig files can then be used to visualize signal distribution for the sequencing reads using [IGV](https://igv.org/app/) or [WashU Epigenome Browser](https://epigenomegateway.wustl.edu/legacy/). 
 ## Peak calling
 Call broad signal peaks on each replicate - FDR 0.01 as recommended in the [program's documentation](https://macs3-project.github.io/MACS/docs/callpeak.html). The BAM file must be first converted to a MACS3 compatible BED file.
 ```bash
